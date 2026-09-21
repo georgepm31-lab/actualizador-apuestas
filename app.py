@@ -153,7 +153,3 @@ if __name__ == "__main__":
     # 3. Guardamos/Sobrescribimos el reporte limpio en su pestaña dedicada
     guardar_reporte_en_sheets(cliente, texto_analisis)
 
-if __name__ == "__main__":
-    hoja_destino = conectar_sheets()
-    df_partidos = obtener_partidos_en_vivo()
-    actualizar_google_sheets(df_partidos, hoja_destino)
