@@ -68,14 +68,11 @@ def obtener_partidos_en_vivo():
 def generar_analisis_cuantitativo(df_partidos):
     print("Ejecutando modelo cuantitativo con Gemini...")
     
-    # Verificamos que la API Key esté disponible en el entorno de GitHub Actions
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         return "Error: No se encontró la GEMINI_API_KEY en las variables de entorno de GitHub."
 
     client = genai.Client(api_key=api_key)
-    
-    # Convertimos los partidos del DataFrame a texto para que la IA los lea
     cartelera_texto = df_partidos.to_string(index=False)
     
     prompt_cuantitativo = f"""
@@ -105,7 +102,7 @@ def generar_analisis_cuantitativo(df_partidos):
 
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-3.6-flash',
             contents=prompt_cuantitativo,
         )
         return response.text
@@ -116,20 +113,16 @@ def guardar_reporte_en_sheets(cliente_sheets, texto_reporte):
     print(f"Actualizando la pestaña '{NOMBRE_PESTAÑA_REPORTE}' en Google Sheets...")
     spreadsheet = cliente_sheets.open(NOMBRE_SHEET)
     
-    # Intentamos acceder a la pestaña del reporte, si no existe, la creamos
     try:
         hoja_reporte = spreadsheet.worksheet(NOMBRE_PESTAÑA_REPORTE)
     except gspread.exceptions.WorksheetNotFound:
         hoja_reporte = spreadsheet.add_worksheet(title=NOMBRE_PESTAÑA_REPORTE, rows=100, cols=5)
     
-    # SOBREESCRITURA LIMPIA: Borramos todo lo anterior para que no se acumule basura
     hoja_reporte.clear()
     
-    # Transformamos el texto del reporte en filas de una sola columna para la hoja
     lineas = texto_reporte.split('\n')
     datos_para_sheets = [[linea] for linea in lineas]
     
-    # Escribimos el reporte fresco del día
     hoja_reporte.update(datos_para_sheets)
     print("¡Reporte cuantitativo sincronizado y sobrescrito con éxito!")
 
@@ -141,14 +134,18 @@ def actualizar_google_sheets(df, hoja):
 
 if __name__ == "__main__":
     cliente = conectar_sheets()
+    spreadsheet = cliente.open(NOMBRE_SHEET)
     
-    # 1. Actualizamos la cartelera base de partidos en la hoja principal
-    hoja_destino = cliente.open(NOMBRE_SHEET).sheet1
+    # 1. Actualizamos la cartelera base de partidos en la hoja principal (sheet1)
+    hoja_destino = spreadsheet.sheet1
     df_partidos = obtener_partidos_en_vivo()
     actualizar_google_sheets(df_partidos, hoja_destino)
     
     # 2. Generamos el análisis inteligente de Gemini con nuestras reglas estrictas
     texto_analisis = generar_analisis_cuantitativo(df_partidos)
+    
+    # 3. Guardamos/Sobrescribimos el reporte limpio en su pestaña dedicada
+    guardar_reporte_en_sheets(cliente, texto_analisis)
     
     # 3. Guardamos/Sobrescribimos el reporte limpio en su pestaña dedicada
     guardar_reporte_en_sheets(cliente, texto_analisis)
