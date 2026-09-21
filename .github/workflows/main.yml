@@ -19,7 +19,7 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install pandas gspread oauth2client requests beautifulsoup4
+          pip install pandas gspread oauth2client requests beautifulsoup4 google-genai
 
       - name: Restaurar credenciales desde el secreto
         run: |
