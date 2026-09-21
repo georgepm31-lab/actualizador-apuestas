@@ -26,5 +26,7 @@ jobs:
           echo '${{ secrets.GCP_CREDENTIALS }}' > credenciales.json
 
       - name: Ejecutar script de partidos
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python3 app.py
