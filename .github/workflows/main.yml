@@ -2,7 +2,7 @@ name: Actualizar Cartelera Diaria
 
 on:
   schedule:
-    - cron: '0 9 * * *' # Se ejecutara todos los días a las 5:00 AM hora de Montreal
+    - cron: '0 8 * * *' # Se ejecuta todos los días a las 5:00 AM hora de Montreal
   workflow_dispatch: # Permite ejecutarlo de forma manual cuando quieras desde la pestaña Actions
 
 jobs:
@@ -19,14 +19,12 @@ jobs:
 
       - name: Instalar dependencias
         run: |
-          pip install pandas gspread oauth2client requests beautifulsoup4 google-genai
+          pip install pandas gspread oauth2client requests
 
       - name: Restaurar credenciales desde el secreto
         run: |
           echo '${{ secrets.GCP_CREDENTIALS }}' > credenciales.json
 
       - name: Ejecutar script de partidos
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python3 app.py
