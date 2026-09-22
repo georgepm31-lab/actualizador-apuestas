@@ -2,7 +2,7 @@ name: Actualizar Cartelera Diaria
 
 on:
   schedule:
-    - cron: '0 9 * * *' # Se ejecuta todos los días a las 5:00 AM hora de Montreal
+    - cron: '0 9 * * *' # Se ejecutara todos los días a las 5:00 AM hora de Montreal
   workflow_dispatch: # Permite ejecutarlo de forma manual cuando quieras desde la pestaña Actions
 
 jobs:
